@@ -1,199 +1,62 @@
-# zip 2l - Secure File Compression & Extraction
+# zip 2l
 
-A full-stack web application for securely compressing and extracting files with password protection. Built with FastAPI and modern JavaScript.
+Secure file compression and extraction tool. Compress files into password-protected ZIP/7z archives or extract them. All processing happens server-side and files are deleted immediately after use.
 
-## Features
-
-- **Compress Files**: Upload multiple files/folders and create password-protected ZIP or 7z archives
-- **Extract Archives**: Upload ZIP or 7z files and extract them with password support
-- **Strong Encryption**:
-  - ZIP files use AES-256 encryption (via pyzipper)
-  - 7z files use strong encryption with header encryption (recommended)
-- **Privacy First**: Files are processed server-side and deleted immediately after use
-- **Large File Support**: Handles files 500MB+ reliably with streaming
-- **Modern UI**: Minimal black & white design with Font Awesome icons, drag-and-drop support
-- **Dark/Light Mode Toggle**: Switch between dark and light themes
-- **Enhanced File Preview**: Table view with file sizes and total size display
-- **Compression Level Control**: Adjustable compression level (1-9: faster to better)
-- **Post-Extraction Features**: View extracted file list, selective download, and individual file downloads
-- **Rate Limiting**: IP-based rate limiting to prevent abuse
-- **Maximum Archive Size**: Configurable size limits with clear error messages
-- **Client-Side Libraries**: JSZip and fflate for client-side operations
-
-## Tech Stack
-
-- **Backend**: Python 3.8+ with FastAPI
-- **Frontend**: Vanilla JavaScript with minimal CSS (separate files)
-- **Icons**: Font Awesome 6.4.0
-- **Libraries**:
-  - `pyzipper` - AES-256 encrypted ZIP files
-  - `py7zr` - 7z archive support with strong encryption
-  - `aiofiles` - Async file operations
-  - `python-multipart` - File upload handling
-
-## Installation
-
-1. **Clone the repository**:
+## Quick Start
 
 ```bash
-git clone <repository-url>
+# Clone and setup
+git clone https://github.com/bytegen-dev/zip-2l.git
 cd zip-2l
-```
-
-2. **Create a virtual environment** (recommended):
-
-```bash
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**:
-
-```bash
+source venv/bin/activate
 pip install -r requirements.txt
-```
 
-## Running the Application
-
-### Development Mode
-
-```bash
+# Run
 python main.py
 ```
 
-Or using uvicorn directly:
+Visit `http://localhost:8000/web` to use it.
 
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+## Features
 
-The application will be available at:
+- Compress files/folders → password-protected ZIP or 7z
+- Extract archives → with password support
+- AES-256 encryption for ZIP files
+- 7z format (recommended - stronger security)
+- Dark/light mode toggle
+- Selective file downloads after extraction
+- Compression level control (1-9)
+- Rate limiting & size limits
+- Clean minimal UI
 
-- **Web UI**: `http://localhost:8000/web`
-- **API Endpoints**: `http://localhost:8000/compress` and `http://localhost:8000/extract`
+## Tech Stack
 
-### Production Mode
+- **Backend**: FastAPI (Python)
+- **Frontend**: Vanilla JS + CSS
+- **Libraries**: pyzipper, py7zr, JSZip
 
-For production, use a production ASGI server:
+## API
 
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-```
+- `POST /compress` - Compress files (form data: files, password, format, compression_level)
+- `POST /extract` - Extract archive (form data: archive, password)
 
-## Project Structure
+Returns JSON with file list and base64-encoded ZIP data.
 
-```
-zip-2l/
-├── main.py              # FastAPI backend
-├── static/
-│   ├── index.html      # Main HTML page
-│   ├── style.css       # Styles (minimal black & white)
-│   └── app.js          # JavaScript functionality
-├── tests/
-│   ├── test_compress.py
-│   ├── test_extract.py
-│   └── outputs/        # Test output files
-└── requirements.txt
-```
+## Config
 
-## API Endpoints
+Environment variables:
+- `MAX_ARCHIVE_SIZE` - Max size in bytes (default: 5GB)
+- `RATE_LIMIT_PER_MINUTE` - Rate limit per IP (default: 10)
 
-### POST /compress
+## Privacy
 
-Compress files into a ZIP or 7z archive.
+Files are processed server-side and deleted immediately. No logging, no storage. Your files stay private.
 
-**Form Data**:
+## Deploy
 
-- `files`: Multiple files (multipart/form-data)
-- `password`: Optional password string
-- `format`: Archive format - "zip" or "7z" (default: "zip")
+Works on Render, Railway, Fly.io, DigitalOcean, etc. Just point to `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
-**Response**: Binary archive file stream
-
-### POST /extract
-
-Extract files from a ZIP or 7z archive.
-
-**Form Data**:
-
-- `archive`: Archive file (multipart/form-data)
-- `password`: Optional password string (required if archive is encrypted)
-
-**Response**: Binary ZIP file containing extracted files
-
-**Error Codes**:
-
-- `401`: Wrong password
-- `400`: Invalid archive format or extraction error
-- `500`: Server error
-
-## Privacy & Security
-
-🔒 **Privacy Statement**:
-
-- Files are processed only on the server
-- All files (uploaded and extracted) are deleted immediately after processing
-- No logging of file names or contents
-- No persistent storage of user data
-
-**Security Features**:
-
-- AES-256 encryption for ZIP files (avoids weak ZipCrypto)
-- 7z format recommended for stronger security (encrypts file names)
-- HTTPS recommended for production deployments
-- Temporary files cleaned up automatically
-
-## Deployment
-
-This application can be deployed on any platform that supports Python:
-
-- **Render**: Add `requirements.txt` and set start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- **Railway**: Automatic detection of FastAPI apps
-- **Fly.io**: Use `fly.toml` configuration
-- **DigitalOcean App Platform**: Supports Python apps
-- **Vercel**: Use serverless functions (may require adjustments)
-
-### Environment Variables
-
-No environment variables required for basic operation. For production, consider:
-
-- `PORT`: Server port (default: 8000)
-- `MAX_ARCHIVE_SIZE`: Maximum archive size in bytes (default: 5GB)
-- `RATE_LIMIT_PER_MINUTE`: Rate limit per IP address (default: 10 requests/minute)
-
-## Limitations
-
-- Maximum file size depends on server configuration and available memory
-- Very large files (>1GB) may take significant time to process
-- Browser memory limits apply to file uploads (server-side processing avoids this)
-
-## License
-
-Open source - ready for GitHub. See LICENSE file for details.
-
-## Contributing
-
-Contributions welcome! Please ensure:
-
-- Code follows security best practices
-- No logging of sensitive file information
-- Proper cleanup of temporary files
-- Tests for new features
-
-## Web Interface
-
-The web interface is served at `/web` and provides:
-
-- **Compress Tab**: Upload multiple files, set optional password, choose ZIP or 7z format
-- **Extract Tab**: Upload archive files, enter password if required
-- **Drag & Drop**: Easy file upload via drag-and-drop
-- **Progress Indicators**: Visual feedback during processing
-- **Error Handling**: Clear error messages for wrong passwords and other issues
-
-## Support
-
-For issues or questions, please open an issue on GitHub.
-
-## Repository
+## Repo
 
 https://github.com/bytegen-dev/zip-2l
