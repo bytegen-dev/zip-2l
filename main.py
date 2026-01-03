@@ -90,11 +90,16 @@ async def compress_files(
         temp_dir = tempfile.mkdtemp()
         temp_dir_path = Path(temp_dir)
         
-        # Save uploaded files to temp directory
+        # Save uploaded files to temp directory, preserving folder structure
+        file_paths = []
         for filename, content in file_contents:
+            # Handle folder structure - filename may contain path separators
+            # Create directory structure if needed
             file_path = temp_dir_path / filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(content)
+            file_paths.append(file_path)
         
         # Create archive
         archive_name = f"archive.{format}"
@@ -112,9 +117,11 @@ async def compress_files(
                 ) as zf:
                     zf.setpassword(password.encode('utf-8'))
                     
-                    for file_path in temp_dir_path.iterdir():
-                        if file_path.is_file() and file_path.name != archive_name:
-                            zf.write(file_path, file_path.name)
+                    # Write files preserving folder structure
+                    for file_path in file_paths:
+                        if file_path.exists() and file_path.is_file():
+                            arcname = file_path.relative_to(temp_dir_path)
+                            zf.write(file_path, str(arcname))
             else:
                 # Create unencrypted ZIP
                 with zipfile.ZipFile(
@@ -122,18 +129,22 @@ async def compress_files(
                     'w',
                     compression=zipfile.ZIP_DEFLATED
                 ) as zf:
-                    for file_path in temp_dir_path.iterdir():
-                        if file_path.is_file() and file_path.name != archive_name:
-                            zf.write(file_path, file_path.name)
+                    # Write files preserving folder structure
+                    for file_path in file_paths:
+                        if file_path.exists() and file_path.is_file():
+                            arcname = file_path.relative_to(temp_dir_path)
+                            zf.write(file_path, str(arcname))
         else:  # 7z format
             # Map compression level (1-9) to py7zr levels
             # Note: py7zr compression is handled via filters, default is good compression
             # For simplicity, we'll use the default compression which is already good
             # Compression level mainly affects 7z's internal settings
             with py7zr.SevenZipFile(archive_path, 'w', password=password) as archive:
-                for file_path in temp_dir_path.iterdir():
-                    if file_path.is_file() and file_path.name != archive_name:
-                        archive.write(file_path, file_path.name)
+                # Write files preserving folder structure
+                for file_path in file_paths:
+                    if file_path.exists() and file_path.is_file():
+                        arcname = file_path.relative_to(temp_dir_path)
+                        archive.write(file_path, str(arcname))
         
         # Read the archive into memory before cleanup
         async with aiofiles.open(archive_path, 'rb') as f:
