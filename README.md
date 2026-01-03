@@ -6,7 +6,7 @@ A full-stack web application for securely compressing and extracting files with 
 
 - **Compress Files**: Upload multiple files/folders and create password-protected ZIP or 7z archives
 - **Extract Archives**: Upload ZIP or 7z files and extract them with password support
-- **Strong Encryption**: 
+- **Strong Encryption**:
   - ZIP files use AES-256 encryption (via pyzipper)
   - 7z files use strong encryption with header encryption (recommended)
 - **Privacy First**: Files are processed server-side and deleted immediately after use
@@ -26,18 +26,21 @@ A full-stack web application for securely compressing and extracting files with 
 ## Installation
 
 1. **Clone the repository**:
+
 ```bash
 git clone <repository-url>
 cd zip-2l
 ```
 
 2. **Create a virtual environment** (recommended):
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. **Install dependencies**:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -73,6 +76,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 Compress files into a ZIP or 7z archive.
 
 **Form Data**:
+
 - `files`: Multiple files (multipart/form-data)
 - `password`: Optional password string
 - `format`: Archive format - "zip" or "7z" (default: "zip")
@@ -84,25 +88,29 @@ Compress files into a ZIP or 7z archive.
 Extract files from a ZIP or 7z archive.
 
 **Form Data**:
+
 - `archive`: Archive file (multipart/form-data)
 - `password`: Optional password string (required if archive is encrypted)
 
 **Response**: Binary ZIP file containing extracted files
 
 **Error Codes**:
+
 - `401`: Wrong password
 - `400`: Invalid archive format or extraction error
 - `500`: Server error
 
 ## Privacy & Security
 
-🔒 **Privacy Statement**: 
+🔒 **Privacy Statement**:
+
 - Files are processed only on the server
 - All files (uploaded and extracted) are deleted immediately after processing
 - No logging of file names or contents
 - No persistent storage of user data
 
 **Security Features**:
+
 - AES-256 encryption for ZIP files (avoids weak ZipCrypto)
 - 7z format recommended for stronger security (encrypts file names)
 - HTTPS recommended for production deployments
@@ -121,6 +129,7 @@ This application can be deployed on any platform that supports Python:
 ### Environment Variables
 
 No environment variables required for basic operation. For production, consider:
+
 - `PORT`: Server port (default: 8000)
 - `MAX_UPLOAD_SIZE`: Maximum file size (configure in FastAPI)
 
@@ -137,6 +146,7 @@ Open source - ready for GitHub. See LICENSE file for details.
 ## Contributing
 
 Contributions welcome! Please ensure:
+
 - Code follows security best practices
 - No logging of sensitive file information
 - Proper cleanup of temporary files
@@ -145,4 +155,3 @@ Contributions welcome! Please ensure:
 ## Support
 
 For issues or questions, please open an issue on GitHub.
-
