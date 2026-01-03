@@ -11,12 +11,13 @@ A full-stack web application for securely compressing and extracting files with 
   - 7z files use strong encryption with header encryption (recommended)
 - **Privacy First**: Files are processed server-side and deleted immediately after use
 - **Large File Support**: Handles files 500MB+ reliably with streaming
-- **Modern UI**: Clean, responsive interface with drag-and-drop support
+- **Modern UI**: Minimal black & white design with Font Awesome icons, drag-and-drop support
 
 ## Tech Stack
 
 - **Backend**: Python 3.8+ with FastAPI
-- **Frontend**: Vanilla JavaScript with modern CSS
+- **Frontend**: Vanilla JavaScript with minimal CSS (separate files)
+- **Icons**: Font Awesome 6.4.0
 - **Libraries**:
   - `pyzipper` - AES-256 encrypted ZIP files
   - `py7zr` - 7z archive support with strong encryption
@@ -59,7 +60,9 @@ Or using uvicorn directly:
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-The application will be available at `http://localhost:8000`
+The application will be available at:
+- **Web UI**: `http://localhost:8000/web`
+- **API Endpoints**: `http://localhost:8000/compress` and `http://localhost:8000/extract`
 
 ### Production Mode
 
@@ -67,6 +70,22 @@ For production, use a production ASGI server:
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+```
+
+## Project Structure
+
+```
+zip-2l/
+├── main.py              # FastAPI backend
+├── static/
+│   ├── index.html      # Main HTML page
+│   ├── style.css       # Styles (minimal black & white)
+│   └── app.js          # JavaScript functionality
+├── tests/
+│   ├── test_compress.py
+│   ├── test_extract.py
+│   └── outputs/        # Test output files
+└── requirements.txt
 ```
 
 ## API Endpoints
@@ -152,6 +171,20 @@ Contributions welcome! Please ensure:
 - Proper cleanup of temporary files
 - Tests for new features
 
+## Web Interface
+
+The web interface is served at `/web` and provides:
+
+- **Compress Tab**: Upload multiple files, set optional password, choose ZIP or 7z format
+- **Extract Tab**: Upload archive files, enter password if required
+- **Drag & Drop**: Easy file upload via drag-and-drop
+- **Progress Indicators**: Visual feedback during processing
+- **Error Handling**: Clear error messages for wrong passwords and other issues
+
 ## Support
 
 For issues or questions, please open an issue on GitHub.
+
+## Repository
+
+https://github.com/bytegen-dev/zip-2l
