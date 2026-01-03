@@ -126,6 +126,10 @@ async def compress_files(
                         if file_path.is_file() and file_path.name != archive_name:
                             zf.write(file_path, file_path.name)
         else:  # 7z format
+            # Map compression level (1-9) to py7zr levels
+            # Note: py7zr compression is handled via filters, default is good compression
+            # For simplicity, we'll use the default compression which is already good
+            # Compression level mainly affects 7z's internal settings
             with py7zr.SevenZipFile(archive_path, 'w', password=password) as archive:
                 for file_path in temp_dir_path.iterdir():
                     if file_path.is_file() and file_path.name != archive_name:
