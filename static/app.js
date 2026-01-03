@@ -436,6 +436,9 @@ function showExtractedFiles(files, zipData, zipFilename) {
               </div>
             </label>
             <span class="file-size">${formatFileSize(file.size)}</span>
+            <button class="remove" onclick="downloadSingleFile(${index})" title="Download this file">
+              <i class="fas fa-download"></i>
+            </button>
           </div>
         `).join("")}
       </div>
@@ -510,6 +513,43 @@ async function downloadSelectedFiles() {
     
   } catch (error) {
     showError("extract-error", "Failed to create archive: " + error.message);
+  }
+}
+
+async function downloadSingleFile(index) {
+  if (!extractedZipData || !extractedFilesData || !extractedFilesData[index]) return;
+  
+  const file = extractedFilesData[index];
+  
+  try {
+    // Decode the original ZIP
+    const binaryString = atob(extractedZipData);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    // Load ZIP using JSZip
+    const zip = await JSZip.loadAsync(bytes);
+    
+    if (!zip.file(file.name)) {
+      showError("extract-error", "File not found in archive.");
+      return;
+    }
+    
+    // Get file data and download
+    const fileData = await zip.file(file.name).async("blob");
+    const url = window.URL.createObjectURL(fileData);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name.split("/").pop(); // Get filename from path
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    showError("extract-error", "Failed to download file: " + error.message);
   }
 }
 
