@@ -305,28 +305,37 @@ body {
   cursor: not-allowed;
 }
 
-.progress {
+.spinner-container {
   display: none;
   margin: 20px 0;
+  text-align: center;
+  align-items: center;
+  gap: 10px;
 }
 
-.progress.active {
-  display: block;
+.spinner-container.active {
+  display: flex;
+  justify-content: center;
 }
 
-.progress-bar {
-  width: 100%;
-  height: 2px;
-  background: #f5f5f5;
-  border: 1px solid #000;
-  overflow: hidden;
+.spinner-container i {
+  font-size: 24px;
+  color: #000;
 }
 
-.progress-fill {
-  height: 100%;
-  background: #000;
-  width: 0%;
-  transition: width 0.3s;
+.spinner-container span {
+  font-size: 16px;
+  color: #000;
+}
+
+body.dark-mode .spinner-container i,
+body.dark-mode .spinner-container span {
+  color: #000;
+}
+
+body.light-mode .spinner-container i,
+body.light-mode .spinner-container span {
+  color: #fff;
 }
 
 .error {
@@ -552,10 +561,6 @@ body.light-mode .btn:hover {
   color: #fff;
 }
 
-body.light-mode .progress-bar {
-  background: #e8e8e8;
-  border: 1px solid #ccc;
-}
 
 body.light-mode .error {
   background: #fff;

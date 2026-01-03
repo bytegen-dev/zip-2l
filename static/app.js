@@ -217,19 +217,8 @@ async function compressFiles() {
   successDiv.classList.remove("active");
   btn.disabled = true;
   progress.classList.add("active");
-  
-  // Update progress bar
-  const progressFill = progress.querySelector(".progress-fill");
-  if (progressFill) {
-    progressFill.style.width = "0%";
-  }
 
   try {
-    // Simulate upload progress
-    let uploadProgress = 0;
-    const totalSize = compressFilesList.reduce((sum, f) => sum + f.size, 0);
-    let uploadedSize = 0;
-    
     const formData = new FormData();
     compressFilesList.forEach((file) => {
       formData.append("files", file);
@@ -240,25 +229,10 @@ async function compressFiles() {
     formData.append("format", format);
     formData.append("compression_level", compressionLevel.toString());
 
-    // Simulate progress during upload/compression
-    const progressInterval = setInterval(() => {
-      if (uploadProgress < 90) {
-        uploadProgress += 5;
-        if (progressFill) {
-          progressFill.style.width = uploadProgress + "%";
-        }
-      }
-    }, 200);
-
     const response = await fetch("/compress", {
       method: "POST",
       body: formData,
     });
-    
-    clearInterval(progressInterval);
-    if (progressFill) {
-      progressFill.style.width = "100%";
-    }
 
     if (!response.ok) {
       const error = await response.json();
@@ -313,25 +287,8 @@ async function extractArchive() {
   successDiv.classList.remove("active");
   btn.disabled = true;
   progress.classList.add("active");
-  
-  // Update progress bar
-  const progressFill = progress.querySelector(".progress-fill");
-  if (progressFill) {
-    progressFill.style.width = "0%";
-  }
 
   try {
-    // Simulate progress during extraction
-    let extractProgress = 0;
-    const progressInterval = setInterval(() => {
-      if (extractProgress < 90) {
-        extractProgress += 5;
-        if (progressFill) {
-          progressFill.style.width = extractProgress + "%";
-        }
-      }
-    }, 200);
-
     const formData = new FormData();
     formData.append("archive", extractFile);
     if (password) {
@@ -342,11 +299,6 @@ async function extractArchive() {
       method: "POST",
       body: formData,
     });
-    
-    clearInterval(progressInterval);
-    if (progressFill) {
-      progressFill.style.width = "100%";
-    }
 
     if (!response.ok) {
       const error = await response.json();
