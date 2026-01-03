@@ -1,6 +1,33 @@
 let compressFilesList = [];
 let extractFile = null;
 
+// Theme toggle
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.getElementById("theme-icon");
+  
+  if (body.classList.contains("light-mode")) {
+    body.classList.remove("light-mode");
+    icon.className = "fas fa-moon";
+    localStorage.setItem("theme", "dark");
+  } else {
+    body.classList.add("light-mode");
+    icon.className = "fas fa-sun";
+    localStorage.setItem("theme", "light");
+  }
+}
+
+// Load saved theme
+document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("theme");
+  const icon = document.getElementById("theme-icon");
+  
+  if (savedTheme === "light") {
+    document.body.classList.add("light-mode");
+    if (icon) icon.className = "fas fa-sun";
+  }
+});
+
 // Tab switching
 function switchTab(tab) {
   document

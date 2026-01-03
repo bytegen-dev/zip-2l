@@ -11,6 +11,7 @@ body {
   min-height: 100vh;
   padding: 20px;
   color: #fff;
+  position: relative;
 }
 
 .container {
@@ -325,5 +326,165 @@ body {
 
 .privacy-notice i {
   margin-right: 5px;
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Light mode styles */
+body.light-mode {
+  background: #fff;
+  color: #000;
+}
+
+body.light-mode .container {
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .header {
+  background: #f5f5f5;
+  color: #000;
+  border-bottom: 1px solid #ccc;
+}
+
+body.light-mode .tabs {
+  border-bottom: 1px solid #ccc;
+}
+
+body.light-mode .tab {
+  background: #f5f5f5;
+  border-right: 1px solid #ccc;
+  color: #000;
+}
+
+body.light-mode .tab:hover {
+  background: #e8e8e8;
+}
+
+body.light-mode .tab.active {
+  background: #fff;
+  color: #000;
+  border-bottom: 2px solid #000;
+}
+
+body.light-mode .content {
+  background: #fff;
+  color: #000;
+}
+
+body.light-mode .upload-zone {
+  border: 2px dashed #ccc;
+  background: #fff;
+}
+
+body.light-mode .upload-zone:hover {
+  background: #f5f5f5;
+}
+
+body.light-mode .upload-zone.dragover {
+  background: #000;
+  color: #fff;
+}
+
+body.light-mode .upload-zone.dragover h3,
+body.light-mode .upload-zone.dragover p {
+  color: #fff;
+}
+
+body.light-mode .upload-zone i {
+  color: #666;
+}
+
+body.light-mode .upload-zone.dragover i {
+  color: #fff;
+}
+
+body.light-mode .file-item {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .file-item .remove {
+  background: #666;
+  color: #fff;
+  border: 1px solid #666;
+}
+
+body.light-mode .file-item .remove:hover {
+  background: #000;
+  color: #fff;
+}
+
+body.light-mode .form-group input,
+body.light-mode .form-group select {
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+body.light-mode .form-group input:focus,
+body.light-mode .form-group select:focus {
+  background: #f5f5f5;
+  border-color: #000;
+}
+
+body.light-mode .btn {
+  background: #666;
+  color: #fff;
+  border: 1px solid #666;
+}
+
+body.light-mode .btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+body.light-mode .progress-bar {
+  background: #e8e8e8;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .error {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .success {
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+}
+
+body.light-mode .privacy-notice {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .theme-toggle {
+  background: #666;
+  color: #fff;
+  border: 1px solid #666;
+}
+
+body.light-mode .theme-toggle:hover {
+  background: #000;
+  color: #fff;
 }
 
