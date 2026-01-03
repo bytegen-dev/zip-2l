@@ -17,13 +17,22 @@ app = FastAPI(title="zip 2l", description="Secure file compression and extractio
 # Mount static files
 static_dir = Path(__file__).parent / "static"
 static_dir.mkdir(exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
+# Create a sub-application for web routes
+from fastapi import APIRouter
 
-@app.get("/")
-async def root():
+web_router = APIRouter()
+
+@web_router.get("/")
+async def web_root():
     """Serve the main HTML page"""
     return FileResponse(str(static_dir / "index.html"))
+
+# Mount static files under /web/static
+app.mount("/web/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Mount web router under /web
+app.include_router(web_router, prefix="/web")
 
 
 @app.post("/compress")
