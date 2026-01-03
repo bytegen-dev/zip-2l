@@ -4,6 +4,18 @@ Secure file compression and extraction tool. Compress files into password-protec
 
 ## Quick Start
 
+### Docker (Recommended)
+
+```bash
+git clone https://github.com/bytegen-dev/zip-2l.git
+cd zip-2l
+docker-compose up
+```
+
+Visit `http://localhost:8000/web` to use it.
+
+### Local Setup
+
 ```bash
 # Clone and setup
 git clone https://github.com/bytegen-dev/zip-2l.git
@@ -54,6 +66,20 @@ Environment variables:
 Files are processed server-side and deleted immediately. No logging, no storage. Your files stay private.
 
 ## Deploy
+
+### Docker
+
+```bash
+docker build -t zip-2l .
+docker run -p 8000:8000 zip-2l
+```
+
+Or use docker-compose:
+```bash
+docker-compose up -d
+```
+
+### Other Platforms
 
 Works on Render, Railway, Fly.io, DigitalOcean, etc. Just point to `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
