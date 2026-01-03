@@ -12,6 +12,9 @@ import zipfile
 import aiofiles
 import io
 
+# Configuration
+MAX_ARCHIVE_SIZE = int(os.getenv("MAX_ARCHIVE_SIZE", 5 * 1024 * 1024 * 1024))  # Default 5GB
+
 app = FastAPI(title="zip 2l", description="Secure file compression and extraction tool")
 
 # Mount static files
@@ -56,15 +59,28 @@ async def compress_files(
     archive_path = None
     
     try:
+        # Check total file size
+        total_size = 0
+        file_contents = []
+        for file in files:
+            content = await file.read()
+            total_size += len(content)
+            file_contents.append((file.filename, content))
+        
+        if total_size > MAX_ARCHIVE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Total file size ({total_size / 1024 / 1024 / 1024:.2f} GB) exceeds maximum allowed size ({MAX_ARCHIVE_SIZE / 1024 / 1024 / 1024:.2f} GB)"
+            )
+        
         # Create temporary directory for processing
         temp_dir = tempfile.mkdtemp()
         temp_dir_path = Path(temp_dir)
         
         # Save uploaded files to temp directory
-        for file in files:
-            file_path = temp_dir_path / file.filename
+        for filename, content in file_contents:
+            file_path = temp_dir_path / filename
             async with aiofiles.open(file_path, 'wb') as f:
-                content = await file.read()
                 await f.write(content)
         
         # Create archive
@@ -145,6 +161,14 @@ async def extract_archive(
     archive_path = None
     
     try:
+        # Read archive content and check size
+        content = await archive.read()
+        if len(content) > MAX_ARCHIVE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Archive size ({len(content) / 1024 / 1024 / 1024:.2f} GB) exceeds maximum allowed size ({MAX_ARCHIVE_SIZE / 1024 / 1024 / 1024:.2f} GB)"
+            )
+        
         # Create temporary directory for processing
         temp_dir = tempfile.mkdtemp()
         temp_dir_path = Path(temp_dir)
@@ -152,7 +176,6 @@ async def extract_archive(
         # Save uploaded archive to temp directory
         archive_path = temp_dir_path / archive.filename
         async with aiofiles.open(archive_path, 'wb') as f:
-            content = await archive.read()
             await f.write(content)
         
         # Determine archive type and extract
