@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zip 2l - Secure File Compression & Extraction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab:hover {
+            background: #e8e8e8;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-zone:hover {
+            background: #f0f2ff;
+            border-color: #764ba2;
+        }
+
+        .upload-zone.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .upload-zone svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .upload-zone p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .file-item span {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .file-item .remove {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .file-item .remove:hover {
+            background: #cc0000;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 0.9em;
+            padding: 5px 10px;
+        }
+
+        .password-toggle:hover {
+            color: #333;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .success.active {
+            display: block;
+        }
+
+        .privacy-notice {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+        }
+
+        .privacy-notice strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 zip 2l</h1>
+            <p>Secure File Compression & Extraction</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('compress')">Compress</button>
+            <button class="tab" onclick="switchTab('extract')">Extract</button>
+        </div>
+
+        <div class="content">
+            <!-- Compress Tab -->
+            <div id="compress-tab" class="tab-content active">
+                <div class="upload-zone" id="compress-zone" onclick="document.getElementById('compress-files').click()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <h3>Drop files here or click to select</h3>
+                    <p>Select multiple files or folders to compress</p>
+                </div>
+                <input type="file" id="compress-files" class="file-input" multiple webkitdirectory>
+                
+                <div id="compress-file-list" class="file-list"></div>
+
+                <div class="form-group">
+                    <label for="compress-password">Password (optional)</label>
+                    <div class="password-group">
+                        <input type="password" id="compress-password" placeholder="Enter password for encryption">
+                        <button type="button" class="password-toggle" onclick="togglePassword('compress-password', this)">Show</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="compress-format">Archive Format</label>
+                    <select id="compress-format">
+                        <option value="zip">ZIP (AES-256)</option>
+                        <option value="7z">7z (Recommended - Stronger Security)</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="compressFiles()" id="compress-btn">Compress Files</button>
+
+                <div class="progress" id="compress-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="error" id="compress-error"></div>
+                <div class="success" id="compress-success"></div>
+            </div>
+
+            <!-- Extract Tab -->
+            <div id="extract-tab" class="tab-content">
+                <div class="upload-zone" id="extract-zone" onclick="document.getElementById('extract-file').click()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <h3>Drop archive here or click to select</h3>
+                    <p>Upload a ZIP or 7z file to extract</p>
+                </div>
+                <input type="file" id="extract-file" class="file-input" accept=".zip,.7z">
+
+                <div id="extract-file-name" class="file-list"></div>
+
+                <div class="form-group">
+                    <label for="extract-password">Password (if required)</label>
+                    <div class="password-group">
+                        <input type="password" id="extract-password" placeholder="Enter password if archive is encrypted">
+                        <button type="button" class="password-toggle" onclick="togglePassword('extract-password', this)">Show</button>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="extractArchive()" id="extract-btn">Extract Archive</button>
+
+                <div class="progress" id="extract-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="error" id="extract-error"></div>
+                <div class="success" id="extract-success"></div>
+            </div>
+
+            <div class="privacy-notice">
+                <strong>🔒 Privacy First:</strong> Files are processed only on the server and deleted immediately after use. No logging of file names or contents.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let compressFilesList = [];
+        let extractFile = null;
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'compress') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('compress-tab').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('extract-tab').classList.add('active');
+            }
+            
+            // Clear errors
+            document.querySelectorAll('.error').forEach(e => {
+                e.classList.remove('active');
+                e.textContent = '';
+            });
+            document.querySelectorAll('.success').forEach(e => {
+                e.classList.remove('active');
+                e.textContent = '';
+            });
+        }
+
+        // Password toggle
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                button.textContent = 'Show';
+            }
+        }
+
+        // Drag and drop for compress
+        const compressZone = document.getElementById('compress-zone');
+        const compressInput = document.getElementById('compress-files');
+
+        compressZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            compressZone.classList.add('dragover');
+        });
+
+        compressZone.addEventListener('dragleave', () => {
+            compressZone.classList.remove('dragover');
+        });
+
+        compressZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            compressZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            addCompressFiles(files);
+        });
+
+        compressInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            addCompressFiles(files);
+        });
+
+        function addCompressFiles(files) {
+            compressFilesList = [...compressFilesList, ...files];
+            updateCompressFileList();
+        }
+
+        function removeCompressFile(index) {
+            compressFilesList.splice(index, 1);
+            updateCompressFileList();
+        }
+
+        function updateCompressFileList() {
+            const list = document.getElementById('compress-file-list');
+            if (compressFilesList.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            list.innerHTML = compressFilesList.map((file, index) => `
+                <div class="file-item">
+                    <span>${file.name} (${formatFileSize(file.size)})</span>
+                    <button class="remove" onclick="removeCompressFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        // Drag and drop for extract
+        const extractZone = document.getElementById('extract-zone');
+        const extractInput = document.getElementById('extract-file');
+
+        extractZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            extractZone.classList.add('dragover');
+        });
+
+        extractZone.addEventListener('dragleave', () => {
+            extractZone.classList.remove('dragover');
+        });
+
+        extractZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            extractZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                extractFile = files[0];
+                updateExtractFileList();
+            }
+        });
+
+        extractInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                extractFile = e.target.files[0];
+                updateExtractFileList();
+            }
+        });
+
+        function updateExtractFileList() {
+            const list = document.getElementById('extract-file-name');
+            if (!extractFile) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            list.innerHTML = `
+                <div class="file-item">
+                    <span>${extractFile.name} (${formatFileSize(extractFile.size)})</span>
+                </div>
+            `;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Compress files
+        async function compressFiles() {
+            if (compressFilesList.length === 0) {
+                showError('compress-error', 'Please select at least one file to compress.');
+                return;
+            }
+
+            const password = document.getElementById('compress-password').value;
+            const format = document.getElementById('compress-format').value;
+            const btn = document.getElementById('compress-btn');
+            const progress = document.getElementById('compress-progress');
+            const errorDiv = document.getElementById('compress-error');
+            const successDiv = document.getElementById('compress-success');
+
+            // Reset UI
+            errorDiv.classList.remove('active');
+            successDiv.classList.remove('active');
+            btn.disabled = true;
+            progress.classList.add('active');
+
+            try {
+                const formData = new FormData();
+                compressFilesList.forEach(file => {
+                    formData.append('files', file);
+                });
+                if (password) {
+                    formData.append('password', password);
+                }
+                formData.append('format', format);
+
+                const response = await fetch('/compress', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Compression failed');
+                }
+
+                // Download the file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `archive.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                successDiv.textContent = 'Files compressed successfully! Download started.';
+                successDiv.classList.add('active');
+                
+                // Clear files
+                compressFilesList = [];
+                updateCompressFileList();
+                document.getElementById('compress-password').value = '';
+
+            } catch (error) {
+                showError('compress-error', error.message);
+            } finally {
+                btn.disabled = false;
+                progress.classList.remove('active');
+            }
+        }
+
+        // Extract archive
+        async function extractArchive() {
+            if (!extractFile) {
+                showError('extract-error', 'Please select an archive file to extract.');
+                return;
+            }
+
+            const password = document.getElementById('extract-password').value;
+            const btn = document.getElementById('extract-btn');
+            const progress = document.getElementById('extract-progress');
+            const errorDiv = document.getElementById('extract-error');
+            const successDiv = document.getElementById('extract-success');
+
+            // Reset UI
+            errorDiv.classList.remove('active');
+            successDiv.classList.remove('active');
+            btn.disabled = true;
+            progress.classList.add('active');
+
+            try {
+                const formData = new FormData();
+                formData.append('archive', extractFile);
+                if (password) {
+                    formData.append('password', password);
+                }
+
+                const response = await fetch('/extract', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    if (response.status === 401) {
+                        throw new Error(error.detail || 'Wrong password. Please try again.');
+                    }
+                    throw new Error(error.detail || 'Extraction failed');
+                }
+
+                // Download the extracted files
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'extracted.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                successDiv.textContent = 'Archive extracted successfully! Download started.';
+                successDiv.classList.add('active');
+                
+                // Clear file
+                extractFile = null;
+                updateExtractFileList();
+                document.getElementById('extract-password').value = '';
+
+            } catch (error) {
+                showError('extract-error', error.message);
+            } finally {
+                btn.disabled = false;
+                progress.classList.remove('active');
+            }
+        }
+
+        function showError(errorId, message) {
+            const errorDiv = document.getElementById(errorId);
+            errorDiv.textContent = message;
+            errorDiv.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+
