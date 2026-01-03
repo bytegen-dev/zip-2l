@@ -308,16 +308,30 @@ async function extractArchive() {
       throw new Error(error.detail || "Extraction failed");
     }
 
-    // Download the extracted files
-    const blob = await response.blob();
+    // Parse JSON response
+    const data = await response.json();
+    const files = data.files || [];
+    const zipData = data.zip_data;
+    const zipFilename = data.zip_filename || "extracted.zip";
+
+    // Download the extracted files ZIP
+    const binaryString = atob(zipData);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: "application/zip" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "extracted.zip";
+    a.download = zipFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+
+    // Show file list
+    showExtractedFiles(files, zipData, zipFilename);
 
     successDiv.textContent =
       "Archive extracted successfully! Download started.";
@@ -333,6 +347,64 @@ async function extractArchive() {
     btn.disabled = false;
     progress.classList.remove("active");
   }
+}
+
+let extractedFilesData = null;
+let extractedZipData = null;
+let extractedZipFilename = null;
+
+function showExtractedFiles(files, zipData, zipFilename) {
+  extractedFilesData = files;
+  extractedZipData = zipData;
+  extractedZipFilename = zipFilename;
+  
+  const fileListDiv = document.getElementById("extract-file-list");
+  if (!fileListDiv) return;
+  
+  const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+  
+  fileListDiv.innerHTML = `
+    <div class="extracted-files-section">
+      <div class="file-list-header">
+        <strong>${files.length} file${files.length !== 1 ? 's' : ''} extracted</strong>
+        <span>Total: ${formatFileSize(totalSize)}</span>
+      </div>
+      <div class="file-list-table">
+        ${files.map((file, index) => `
+          <div class="file-item">
+            <div class="file-info">
+              <i class="fas fa-file"></i>
+              <span class="file-name" title="${file.name}">${file.name}</span>
+            </div>
+            <span class="file-size">${formatFileSize(file.size)}</span>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn" onclick="downloadExtractedZip()" style="margin-top: 20px;">
+        <i class="fas fa-download"></i> Download All as ZIP
+      </button>
+    </div>
+  `;
+  fileListDiv.style.display = "block";
+}
+
+function downloadExtractedZip() {
+  if (!extractedZipData) return;
+  
+  const binaryString = atob(extractedZipData);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  const blob = new Blob([bytes], { type: "application/zip" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = extractedZipFilename || "extracted.zip";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 }
 
 function showError(errorId, message) {

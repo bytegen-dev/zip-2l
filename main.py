@@ -253,6 +253,16 @@ async def extract_archive(
         if not extracted_files:
             raise HTTPException(status_code=400, detail="Archive appears to be empty.")
         
+        # Create file metadata list
+        file_metadata = []
+        for file_path in extracted_files:
+            rel_path = file_path.relative_to(temp_dir_path)
+            file_metadata.append({
+                "name": str(rel_path),
+                "size": file_path.stat().st_size,
+                "path": str(file_path)
+            })
+        
         # Create a ZIP of extracted files for easy download
         output_zip_path = temp_dir_path / "extracted.zip"
         with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
@@ -265,21 +275,20 @@ async def extract_archive(
         async with aiofiles.open(output_zip_path, 'rb') as f:
             zip_content = await f.read()
         
+        # Return JSON with file list and ZIP data (base64 encoded)
+        import base64
+        from fastapi.responses import JSONResponse
+        
         # Clean up temp directory before returning response
         if temp_dir and os.path.exists(temp_dir):
             shutil.rmtree(temp_dir, ignore_errors=True)
             temp_dir = None
         
-        # Return the ZIP as a response
-        from fastapi.responses import Response
-        return Response(
-            content=zip_content,
-            media_type="application/zip",
-            headers={
-                "Content-Disposition": "attachment; filename=extracted.zip",
-                "Content-Type": "application/zip"
-            }
-        )
+        return JSONResponse(content={
+            "files": [{"name": f["name"], "size": f["size"]} for f in file_metadata],
+            "zip_data": base64.b64encode(zip_content).decode('utf-8'),
+            "zip_filename": "extracted.zip"
+        })
     
     except HTTPException:
         # Clean up on error

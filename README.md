@@ -61,6 +61,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The application will be available at:
+
 - **Web UI**: `http://localhost:8000/web`
 - **API Endpoints**: `http://localhost:8000/compress` and `http://localhost:8000/extract`
 
