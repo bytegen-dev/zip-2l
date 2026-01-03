@@ -15,9 +15,10 @@ A full-stack web application for securely compressing and extracting files with 
 - **Dark/Light Mode Toggle**: Switch between dark and light themes
 - **Enhanced File Preview**: Table view with file sizes and total size display
 - **Compression Level Control**: Adjustable compression level (1-9: faster to better)
-- **Post-Extraction Features**: View extracted file list and re-download as ZIP
+- **Post-Extraction Features**: View extracted file list, selective download, and individual file downloads
 - **Rate Limiting**: IP-based rate limiting to prevent abuse
 - **Maximum Archive Size**: Configurable size limits with clear error messages
+- **Client-Side Libraries**: JSZip and fflate for client-side operations
 
 ## Tech Stack
 
