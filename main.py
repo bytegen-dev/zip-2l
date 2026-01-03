@@ -3,9 +3,12 @@ import tempfile
 import shutil
 from pathlib import Path
 from typing import Optional, List
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import pyzipper
 import py7zr
 import zipfile
@@ -14,8 +17,14 @@ import io
 
 # Configuration
 MAX_ARCHIVE_SIZE = int(os.getenv("MAX_ARCHIVE_SIZE", 5 * 1024 * 1024 * 1024))  # Default 5GB
+RATE_LIMIT_PER_MINUTE = int(os.getenv("RATE_LIMIT_PER_MINUTE", 10))  # Default 10 requests per minute
 
 app = FastAPI(title="zip 2l", description="Secure file compression and extraction tool")
+
+# Rate limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Mount static files
 static_dir = Path(__file__).parent / "static"
@@ -39,7 +48,9 @@ app.include_router(web_router, prefix="/web")
 
 
 @app.post("/compress")
+@limiter.limit(f"{RATE_LIMIT_PER_MINUTE}/minute")
 async def compress_files(
+    request: Request,
     files: List[UploadFile] = File(...),
     password: Optional[str] = Form(None),
     format: str = Form("zip")
@@ -146,7 +157,9 @@ async def compress_files(
 
 
 @app.post("/extract")
+@limiter.limit(f"{RATE_LIMIT_PER_MINUTE}/minute")
 async def extract_archive(
+    request: Request,
     archive: UploadFile = File(...),
     password: Optional[str] = Form(None)
 ):
