@@ -206,6 +206,7 @@ async function compressFiles() {
 
   const password = document.getElementById("compress-password").value;
   const format = document.getElementById("compress-format").value;
+  const compressionLevel = parseInt(document.getElementById("compress-level").value) || 5;
   const btn = document.getElementById("compress-btn");
   const progress = document.getElementById("compress-progress");
   const errorDiv = document.getElementById("compress-error");
@@ -226,6 +227,7 @@ async function compressFiles() {
       formData.append("password", password);
     }
     formData.append("format", format);
+    formData.append("compression_level", compressionLevel.toString());
 
     const response = await fetch("/compress", {
       method: "POST",
