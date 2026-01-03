@@ -2,6 +2,9 @@
 
 Secure file compression and extraction tool. Compress files into password-protected ZIP/7z archives or extract them. All processing happens server-side and files are deleted immediately after use.
 
+<img width="1132" height="1073" alt="image" src="https://github.com/user-attachments/assets/c6415463-a37f-4050-aaf6-5715504bc3a4" />
+
+
 ## Quick Start
 
 ### Docker (Recommended)
