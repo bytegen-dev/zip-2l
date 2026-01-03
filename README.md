@@ -58,6 +58,7 @@ Returns JSON with file list and base64-encoded ZIP data.
 ## Config
 
 Environment variables:
+
 - `MAX_ARCHIVE_SIZE` - Max size in bytes (default: 5GB)
 - `RATE_LIMIT_PER_MINUTE` - Rate limit per IP (default: 10)
 
@@ -67,6 +68,13 @@ Files are processed server-side and deleted immediately. No logging, no storage.
 
 ## Deploy
 
+### Railway
+
+1. Connect your GitHub repo to Railway
+2. Railway auto-detects the `Dockerfile` and builds it
+3. Set env vars if needed: `MAX_ARCHIVE_SIZE`, `RATE_LIMIT_PER_MINUTE`
+4. Done - Railway handles everything
+
 ### Docker
 
 ```bash
@@ -75,13 +83,14 @@ docker run -p 8000:8000 zip-2l
 ```
 
 Or use docker-compose:
+
 ```bash
 docker-compose up -d
 ```
 
 ### Other Platforms
 
-Works on Render, Railway, Fly.io, DigitalOcean, etc. Just point to `uvicorn main:app --host 0.0.0.0 --port $PORT`
+Works on Render, Fly.io, DigitalOcean, etc. Just point to `uvicorn main:app --host 0.0.0.0 --port $PORT`
 
 ## Repo
 
