@@ -110,16 +110,32 @@ function updateCompressFileList() {
     return;
   }
 
-  list.innerHTML = compressFilesList
-    .map(
-      (file, index) => `
-                <div class="file-item">
-                    <span>${file.name} (${formatFileSize(file.size)})</span>
-                    <button class="remove" onclick="removeCompressFile(${index})">Remove</button>
-                </div>
-            `
-    )
-    .join("");
+  const totalSize = compressFilesList.reduce((sum, file) => sum + file.size, 0);
+  
+  list.innerHTML = `
+    <div class="file-list-header">
+      <strong>${compressFilesList.length} file${compressFilesList.length !== 1 ? 's' : ''} selected</strong>
+      <span>Total: ${formatFileSize(totalSize)}</span>
+    </div>
+    <div class="file-list-table">
+      ${compressFilesList
+        .map(
+          (file, index) => `
+            <div class="file-item">
+              <div class="file-info">
+                <i class="fas fa-file"></i>
+                <span class="file-name" title="${file.name}">${file.name}</span>
+              </div>
+              <span class="file-size">${formatFileSize(file.size)}</span>
+              <button class="remove" onclick="removeCompressFile(${index})" title="Remove">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 // Drag and drop for extract

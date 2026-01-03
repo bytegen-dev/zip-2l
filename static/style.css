@@ -145,32 +145,78 @@ body {
 
 .file-list {
   margin: 20px 0;
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
-.file-item {
+.file-list-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   padding: 12px;
   background: #f5f5f5;
   border: 1px solid #000;
   margin-bottom: 8px;
+  font-size: 0.9em;
 }
 
-.file-item span {
+.file-list-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f5f5f5;
+  border: 1px solid #000;
+  gap: 12px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+
+.file-info i {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.file-name {
   flex: 1;
   font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-size: 0.85em;
+  color: #666;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: right;
 }
 
 .file-item .remove {
   background: #000;
   color: #fff;
   border: 1px solid #000;
-  padding: 6px 12px;
+  padding: 6px 10px;
   cursor: pointer;
   font-size: 0.85em;
   transition: all 0.2s;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .file-item .remove:hover {
@@ -414,6 +460,11 @@ body.light-mode .upload-zone i {
 
 body.light-mode .upload-zone.dragover i {
   color: #fff;
+}
+
+body.light-mode .file-list-header {
+  background: #fff;
+  border: 1px solid #ccc;
 }
 
 body.light-mode .file-item {
