@@ -4,6 +4,7 @@ Secure file compression and extraction tool. Compress files into password-protec
 
 <img width="1132" height="1073" alt="image" src="https://github.com/user-attachments/assets/c6415463-a37f-4050-aaf6-5715504bc3a4" />
 
+**Live Demo:** https://zip-2l-production.up.railway.app/web
 
 ## Quick Start
 
