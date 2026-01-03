@@ -419,23 +419,98 @@ function showExtractedFiles(files, zipData, zipFilename) {
         <strong>${files.length} file${files.length !== 1 ? 's' : ''} extracted</strong>
         <span>Total: ${formatFileSize(totalSize)}</span>
       </div>
+      <div style="margin: 10px 0;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="select-all-files" onchange="toggleAllFiles(this.checked)" checked>
+          <span>Select All</span>
+        </label>
+      </div>
       <div class="file-list-table">
         ${files.map((file, index) => `
           <div class="file-item">
-            <div class="file-info">
-              <i class="fas fa-file"></i>
-              <span class="file-name" title="${file.name}">${file.name}</span>
-            </div>
+            <label style="display: flex; align-items: center; flex: 1; gap: 8px; cursor: pointer; min-width: 0;">
+              <input type="checkbox" class="file-checkbox" data-index="${index}" checked>
+              <div class="file-info" style="flex: 1; min-width: 0;">
+                <i class="fas fa-file"></i>
+                <span class="file-name" title="${file.name}">${file.name}</span>
+              </div>
+            </label>
             <span class="file-size">${formatFileSize(file.size)}</span>
           </div>
         `).join("")}
       </div>
-      <button class="btn" onclick="downloadExtractedZip()" style="margin-top: 20px;">
-        <i class="fas fa-download"></i> Download All as ZIP
-      </button>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn" onclick="downloadSelectedFiles()" style="flex: 1;">
+          <i class="fas fa-download"></i> Download Selected
+        </button>
+        <button class="btn" onclick="downloadExtractedZip()" style="flex: 1;">
+          <i class="fas fa-download"></i> Download All
+        </button>
+      </div>
     </div>
   `;
   fileListDiv.style.display = "block";
+}
+
+function toggleAllFiles(checked) {
+  document.querySelectorAll(".file-checkbox").forEach(cb => {
+    cb.checked = checked;
+  });
+}
+
+async function downloadSelectedFiles() {
+  if (!extractedZipData || !extractedFilesData) return;
+  
+  const selectedIndices = Array.from(document.querySelectorAll(".file-checkbox:checked"))
+    .map(cb => parseInt(cb.dataset.index));
+  
+  if (selectedIndices.length === 0) {
+    showError("extract-error", "Please select at least one file to download.");
+    return;
+  }
+  
+  try {
+    // Decode the original ZIP
+    const binaryString = atob(extractedZipData);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    // Load ZIP using JSZip
+    const zip = await JSZip.loadAsync(bytes);
+    const newZip = new JSZip();
+    
+    // Add only selected files
+    let addedCount = 0;
+    for (const index of selectedIndices) {
+      const file = extractedFilesData[index];
+      if (file && zip.file(file.name)) {
+        const fileData = await zip.file(file.name).async("uint8array");
+        newZip.file(file.name, fileData);
+        addedCount++;
+      }
+    }
+    
+    if (addedCount === 0) {
+      showError("extract-error", "No files could be added to the archive.");
+      return;
+    }
+    
+    // Generate and download the new ZIP
+    const blob = await newZip.generateAsync({ type: "blob" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selected_files.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+  } catch (error) {
+    showError("extract-error", "Failed to create archive: " + error.message);
+  }
 }
 
 function downloadExtractedZip() {
