@@ -12,6 +12,12 @@ A full-stack web application for securely compressing and extracting files with 
 - **Privacy First**: Files are processed server-side and deleted immediately after use
 - **Large File Support**: Handles files 500MB+ reliably with streaming
 - **Modern UI**: Minimal black & white design with Font Awesome icons, drag-and-drop support
+- **Dark/Light Mode Toggle**: Switch between dark and light themes
+- **Enhanced File Preview**: Table view with file sizes and total size display
+- **Compression Level Control**: Adjustable compression level (1-9: faster to better)
+- **Post-Extraction Features**: View extracted file list and re-download as ZIP
+- **Rate Limiting**: IP-based rate limiting to prevent abuse
+- **Maximum Archive Size**: Configurable size limits with clear error messages
 
 ## Tech Stack
 
@@ -151,7 +157,8 @@ This application can be deployed on any platform that supports Python:
 No environment variables required for basic operation. For production, consider:
 
 - `PORT`: Server port (default: 8000)
-- `MAX_UPLOAD_SIZE`: Maximum file size (configure in FastAPI)
+- `MAX_ARCHIVE_SIZE`: Maximum archive size in bytes (default: 5GB)
+- `RATE_LIMIT_PER_MINUTE`: Rate limit per IP address (default: 10 requests/minute)
 
 ## Limitations
 
