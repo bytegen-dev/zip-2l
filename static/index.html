@@ -75,6 +75,24 @@
             </select>
           </div>
 
+          <div class="form-group">
+            <label for="compress-level">
+              Compression Level: <span id="compress-level-value">5</span>
+            </label>
+            <input
+              type="range"
+              id="compress-level"
+              min="1"
+              max="9"
+              value="5"
+              oninput="document.getElementById('compress-level-value').textContent = this.value"
+            />
+            <div class="compress-level-labels">
+              <span>Faster</span>
+              <span>Better</span>
+            </div>
+          </div>
+
           <button class="btn" onclick="compressFiles()" id="compress-btn">
             Compress Files
           </button>

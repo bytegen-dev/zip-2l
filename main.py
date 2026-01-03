@@ -53,7 +53,8 @@ async def compress_files(
     request: Request,
     files: List[UploadFile] = File(...),
     password: Optional[str] = Form(None),
-    format: str = Form("zip")
+    format: str = Form("zip"),
+    compression_level: Optional[int] = Form(5)
 ):
     """
     Compress uploaded files into a ZIP or 7z archive.
@@ -62,6 +63,7 @@ async def compress_files(
         files: List of files to compress
         password: Optional password for encryption
         format: Archive format ('zip' or '7z')
+        compression_level: Compression level 1-9 (1=faster, 9=better)
     """
     if format not in ["zip", "7z"]:
         raise HTTPException(status_code=400, detail="Format must be 'zip' or '7z'")
